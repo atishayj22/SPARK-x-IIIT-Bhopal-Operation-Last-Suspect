@@ -2,34 +2,47 @@ import { useEffect, useRef, useState, type CSSProperties, type FormEvent } from 
 import { Route, Switch, Router as WouterRouter } from 'wouter';
 import NotFound from '@/pages/not-found';
 
-type WireColor = 'coral' | 'amber' | 'teal';
+type WireColor = 'coral' | 'sky' | 'purple';
 const wires: { id: WireColor; name: string; color: string }[] = [
-  { id: 'coral', name: 'Life support', color: '#c65a4f' },
-  { id: 'amber', name: 'Navigation', color: '#d4a65e' },
-  { id: 'teal', name: 'Comms array', color: '#6eaaa1' },
+  { id: 'coral', name: 'Life support', color: '#FF5148' },
+  { id: 'sky', name: 'Navigation', color: '#2699BB' },
+  { id: 'purple', name: 'Comms array', color: '#8065DF' },
 ];
 
-function CrewArt({ className = '' }: { className?: string }) {
+type CrewTone = 'coral' | 'sky' | 'yellow' | 'purple' | 'mint';
+const crewTones: Record<CrewTone, { light: string; mid: string; dark: string; outline: string }> = {
+  coral: { light: '#FF8A7E', mid: '#FF5148', dark: '#CF3039', outline: '#B92D37' },
+  sky: { light: '#B5F1FF', mid: '#67D5F5', dark: '#2385AA', outline: '#226B8D' },
+  yellow: { light: '#FFF0A9', mid: '#FFD65A', dark: '#E4A52A', outline: '#B77C1F' },
+  purple: { light: '#D7C9FF', mid: '#A78BFA', dark: '#7057CC', outline: '#5D4AB1' },
+  mint: { light: '#C7FFE0', mid: '#83E6B1', dark: '#3AAE77', outline: '#258A61' },
+};
+
+function CrewArt({ className = '', tone = 'coral' }: { className?: string; tone?: CrewTone }) {
+  const colors = crewTones[tone];
+  const suitId = `suit-${tone}`;
+  const visorId = `visor-${tone}`;
+  const metalId = `metal-${tone}`;
   return (
     <svg className={`crew-art ${className}`} viewBox="0 0 220 300" role="img" aria-label="Illustration of a lone crew member in a sealed graphite spacesuit">
       <defs>
-        <linearGradient id="suit" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#8e4038" /><stop offset=".48" stopColor="#582c2b" /><stop offset="1" stopColor="#292b2c" /></linearGradient>
-        <linearGradient id="visor" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#d6f4f0" /><stop offset=".35" stopColor="#78bac0" /><stop offset="1" stopColor="#315e68" /></linearGradient>
-        <linearGradient id="metal" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#777a76" /><stop offset="1" stopColor="#353a3a" /></linearGradient>
+        <linearGradient id={suitId} x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor={colors.light} /><stop offset=".48" stopColor={colors.mid} /><stop offset="1" stopColor={colors.dark} /></linearGradient>
+        <linearGradient id={visorId} x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#E8FCFF" /><stop offset=".35" stopColor="#83DDF1" /><stop offset="1" stopColor="#397C99" /></linearGradient>
+        <linearGradient id={metalId} x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#667092" /><stop offset="1" stopColor="#293451" /></linearGradient>
       </defs>
-      <ellipse cx="110" cy="279" rx="65" ry="10" fill="#090b0c" opacity=".65" />
-      <path d="M70 186h80l10 76q-1 12-13 12h-24l-8-51-8 51H84q-13 0-13-12z" fill="url(#suit)" stroke="#a35a4e" strokeWidth="2" />
-      <path d="M82 244h24l-2 17H81q-10 0-10-9v-5zM115 244h24l7 3v5q0 9-10 9h-20z" fill="url(#metal)" stroke="#8b8a7d" strokeWidth="2" />
-      <path d="M69 105q0-45 41-49 44 3 44 50v67q-1 25-27 31H91q-22-5-22-29z" fill="url(#suit)" stroke="#a35a4e" strokeWidth="2.5" />
-      <path d="M62 118q-22 4-23 37l5 36q2 13 14 12l17-3-4-78zM157 118q22 4 24 37l-6 36q-2 13-14 12l-16-3 4-78z" fill="url(#suit)" stroke="#a35a4e" strokeWidth="2.5" />
-      <path d="M70 108q-2-51 40-58 43 5 42 57l-8 24H77z" fill="url(#suit)" stroke="#a35a4e" strokeWidth="2.5" />
-      <path d="M76 102q3-23 26-27l34 3q16 5 17 22l-4 24q-2 12-16 13H93q-16-1-18-14z" fill="url(#visor)" stroke="#c2bfb4" strokeWidth="3" />
-      <path d="M91 86q14-8 36-3" fill="none" stroke="#f2eee1" strokeWidth="3" opacity=".45" strokeLinecap="round" />
-      <path d="M77 181q32 12 67 0v18q-29 17-62 0z" fill="url(#metal)" stroke="#9c7963" strokeWidth="2" />
-      <rect x="96" y="183" width="29" height="13" rx="2" fill="#292e2e" stroke="#b58d5b" strokeWidth="1.5" />
-      <circle cx="103" cy="189.5" r="2.2" fill="#d77b53" /><circle cx="111" cy="189.5" r="2.2" fill="#d4a65e" /><circle cx="119" cy="189.5" r="2.2" fill="#80aaa0" />
-      <path d="M81 146l-8 28M149 146l8 28" stroke="#d0a16a" strokeWidth="2" opacity=".8" />
-      <path d="M93 217h35" stroke="#c2775d" strokeWidth="2" opacity=".65" />
+      <ellipse cx="110" cy="279" rx="65" ry="10" fill="#202744" opacity=".14" />
+      <path d="M70 186h80l10 76q-1 12-13 12h-24l-8-51-8 51H84q-13 0-13-12z" fill={`url(#${suitId})`} stroke={colors.outline} strokeWidth="2" />
+      <path d="M82 244h24l-2 17H81q-10 0-10-9v-5zM115 244h24l7 3v5q0 9-10 9h-20z" fill={`url(#${metalId})`} stroke="#202744" strokeWidth="2" />
+      <path d="M69 105q0-45 41-49 44 3 44 50v67q-1 25-27 31H91q-22-5-22-29z" fill={`url(#${suitId})`} stroke={colors.outline} strokeWidth="2.5" />
+      <path d="M62 118q-22 4-23 37l5 36q2 13 14 12l17-3-4-78zM157 118q22 4 24 37l-6 36q-2 13-14 12l-16-3 4-78z" fill={`url(#${suitId})`} stroke={colors.outline} strokeWidth="2.5" />
+      <path d="M70 108q-2-51 40-58 43 5 42 57l-8 24H77z" fill={`url(#${suitId})`} stroke={colors.outline} strokeWidth="2.5" />
+      <path d="M76 102q3-23 26-27l34 3q16 5 17 22l-4 24q-2 12-16 13H93q-16-1-18-14z" fill={`url(#${visorId})`} stroke="#397C99" strokeWidth="3" />
+      <path d="M91 86q14-8 36-3" fill="none" stroke="#FFFFFF" strokeWidth="3" opacity=".62" strokeLinecap="round" />
+      <path d="M77 181q32 12 67 0v18q-29 17-62 0z" fill={`url(#${metalId})`} stroke="#202744" strokeWidth="2" />
+      <rect x="96" y="183" width="29" height="13" rx="2" fill="#202744" stroke="#FFD65A" strokeWidth="1.5" />
+      <circle cx="103" cy="189.5" r="2.2" fill="#FF5148" /><circle cx="111" cy="189.5" r="2.2" fill="#FFD65A" /><circle cx="119" cy="189.5" r="2.2" fill="#83E6B1" />
+      <path d="M81 146l-8 28M149 146l8 28" stroke="#FFF1C2" strokeWidth="2" opacity=".8" />
+      <path d="M93 217h35" stroke={colors.outline} strokeWidth="2" opacity=".65" />
     </svg>
   );
 }
@@ -216,6 +229,16 @@ function Home() {
       <main id="top">
         <section className="hero" aria-labelledby="hero-title">
           <div className="stars" aria-hidden="true" />
+          <div className="hero-art" aria-hidden="true">
+            <span className="hero-orbit hero-orbit-one" />
+            <span className="hero-orbit hero-orbit-two" />
+            <span className="hero-spark hero-spark-one" />
+            <span className="hero-spark hero-spark-two" />
+            <div className="hero-crew hero-crew-sky"><CrewArt tone="sky" /></div>
+            <div className="hero-crew hero-crew-yellow"><CrewArt tone="yellow" /></div>
+            <div className="hero-crew hero-crew-purple"><CrewArt tone="purple" /></div>
+            <span className="hero-sticker">CREW<br />NOT CLEAR</span>
+          </div>
           <div className="hero-content">
             <div className="eyebrow">SPARK × IIIT Bhopal <span className="mono">/ Field operation 01</span></div>
             <h1 id="hero-title"><span>One of you</span><span className="line-two">is lying.</span></h1>
